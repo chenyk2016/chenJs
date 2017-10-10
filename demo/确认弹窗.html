@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>确认弹框</title>
+<style>
+button{ width:100px; height:40px; line-height:40px;  margin:20px;}
+
+*{ margin:0; padding:0;}
+
+</style>
+<link href="../css/library.css" rel="stylesheet" type="text/css" />
+<script src="../js/library.js"></script>
+
+</head>
+
+<body>
+<button id="btn">确认弹框</button>
+
+
+</div>
+
+<script>
+window.onload=function(){
+	var oBtn=document.getElementById('btn');
+	
+	oBtn.addEventListener('click',function(){
+		oBtn.blur();
+		confirmBox("确认改变颜色吗？！！",function(){
+			oBtn.style.backgroundColor="blue";
+		});
+	},false);//oBtn.click结束
+
+};//onload结束
+
+</script>
+
+
+</body>
+</html>

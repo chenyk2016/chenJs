@@ -1,0 +1,28 @@
+@charset "utf-8";
+/* CSS Document */
+/*
+导航：
+1.膜态层 | 2.错误弹窗 | 3.确认弹窗 | 4.警告弹窗 | 
+*/
+
+
+/*1.膜态层*/
+.modal{width:100%; height:100%; position:fixed; z-index:99; background:#666 ; top:0; left:0; opacity:0.5;}
+
+/*2.错误弹窗*/
+.errorAlertBox{width:400px; height:200px; border:1px solid #CCC; border-radius:10px; background:#EEE;text-align:center; position:absolute; z-index:100;}
+.errorAlertBox p{ line-height:40px; font-size:16px;  padding-top:60px;}
+.errorAlertBox button{ width:100px; height:40px; line-height:40px;  margin:20px;}
+
+/*3.确认弹窗*/
+.confirmBox{width:400px; height:200px; border:1px solid #CCC; border-radius:10px; background:#EEE;text-align:center; position:absolute; z-index:100;}
+.confirmBox p{ line-height:40px; font-size:16px;  padding-top:60px;}
+.confirmBox button{ width:100px; height:40px; line-height:40px;  margin:20px;}
+
+/*4.警告弹窗*/
+.warnBox{width:100px; height:50px; line-height:50px; border:1px solid #CCC; border-radius:10px; background:#EEE;text-align:center; position:absolute; z-index:100; background-color:#a00;}
+
+
+
+
+

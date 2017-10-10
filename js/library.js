@@ -1,0 +1,195 @@
+
+/*
+*个人一些工具和插件
+*/
+
+//1.拖拽
+function fnObjDrag(obj,title){	//obj：拖拽对象 | title:拖拽的标题（可不传）
+	title=title || obj;	
+	title.onmousedown=function(e){
+		//计算鼠标距离元素边框的距离
+		var disX=e.clientX-obj.offsetLeft;	
+		var disY=e.clientY-obj.offsetTop;	
+		document.onmousemove=function(event){
+			//计算元素的移动距离
+			var objX=event.clientX-disX;
+			var objY=event.clientY-disY;
+			//可以移动最大距离
+			var maxWid=document.documentElement.clientWidth-obj.offsetWidth;	//最宽距离
+			var maxHei=document.documentElement.clientHeight-obj.offsetHeight;	//最高距离
+			//判断是否超出边界
+			if(objX<0){
+				objX=0;
+			}else if(objX>maxWid){
+				objX=maxWid;
+			}
+			if(objY<0){
+				objY=0;
+			}else if(objY>maxHei){
+				objY=maxHei;
+			}
+			obj.style.left=objX+"px";
+			obj.style.top=objY+"px";
+		}
+			
+		//---------------取消onmousemove事件
+		document.onmouseup=function(){
+			document.onmousemove=null;
+		}
+		//--------------取消onmousedown默认的事件
+		return false;
+	}
+} ;//拖拽结束
+
+//2.居中显示
+function showCenter(obj){	//obj：居中的对象
+	function center(){
+		var clientW=document.documentElement.clientWidth;
+		var clientH=document.documentElement.clientHeight;
+		obj.style.display="block";
+		var l=(clientW-obj.offsetWidth)/2;
+		var h=(clientH-obj.offsetHeight)/2;	
+		obj.style.left=l+"px";
+		obj.style.top=h+"px";
+	}
+	center();
+	window.addEventListener('resize',center,false);	//调整窗口时
+}//居中显示结束
+
+//3.键盘移动
+function toolKeyMove(obj,dis){	//obj：移动的对象 | 一次移动的距离
+	document.onkeydown=function(event){
+		var k=event.keyCode;
+		var top,left;
+		dis= dis || 10;
+		switch(k){
+			case 37: left=obj.offsetLeft-dis;break;
+			case 38: top=obj.offsetTop-dis;break;
+			case 39: left=obj.offsetLeft+dis;break;
+			case 40: top=obj.offsetTop+dis;break;
+			default: break;
+		}
+		//判断边界
+		disW=obj.offsetParent.offsetWidth-obj.offsetWidth;	//可以移动的宽度
+		disH=obj.offsetParent.offsetHeight-obj.offsetHeight;	//可以移动的高度
+		if(left<0){
+			left=0;
+		}else if(left>disW){
+			left=disW;
+		}
+		if(top<0){
+			top=0;
+		}else if(top>disH){
+			top=disH;
+		}
+		obj.style.left=left+"px";
+		obj.style.top=top+"px";
+	}
+}//键盘移动结束
+
+// ========================================================================
+
+//创建膜态层 返回膜态层本身
+function model(){
+	var oM=document.createElement('div');
+	oM.className="modal";
+	document.body.appendChild(oM);	
+	return function (){	//返回一个删除函数
+		document.body.removeChild(oM);	
+	}
+}
+
+//错误弹窗
+function alertBox(text){	//弹出的内容
+	var deleteModel= model();	//创建膜态层，返回膜态层的删除函数（闭包）
+	//创建对象
+	var oBox=document.createElement('div');
+	oBox.className="errorAlertBox"
+	oBox.innerHTML="<p>"+text+"</p><button>确定</button>";	
+	document.body.appendChild(oBox);
+	//调用居中
+	showCenter(oBox);
+	oBox.style.top="100px";
+	//调用拖拽
+	fnObjDrag(oBox);
+	
+	//点击关闭	
+	var closeBtn=oBox.getElementsByTagName('button')[0];
+	closeBtn.onclick=function(){
+		document.body.removeChild(oBox);	
+		deleteModel();
+	};
+	//防止在按钮上拖拽
+	closeBtn.onmousedown=function(ev){
+		ev.cancelBubble=true;
+	};	
+}
+
+//确认弹窗
+function confirmBox(text,fn){	//弹出的内容 | 点击确认后执行的函数(可选)
+	var deleteModel= model();	//创建膜态层，返回膜态层的删除函数（闭包）
+	//创建对象
+	var oBox=document.createElement('div');
+	oBox.className="confirmBox"
+	oBox.innerHTML="<p>"+text+"</p><button>确定</button>　　　<button>取消</button>";	//点击按钮
+	document.body.appendChild(oBox);
+	//调用居中
+	showCenter(oBox);
+	oBox.style.top="10%";	//改变位置
+	//调用拖拽
+	fnObjDrag(oBox);
+	//点击关闭
+	var closeBtn=oBox.getElementsByTagName('button');
+	closeBtn[0].onclick=function(){
+		document.body.removeChild(oBox);//删除盒子
+		deleteModel();//删除膜态层
+		fn && fn();
+	};
+	closeBtn[1].onclick=function(){
+		document.body.removeChild(oBox);
+		deleteModel();
+	};
+	//防止在按钮上拖拽
+	closeBtn[0].onmousedown=closeBtn[1].onmousedown=function(ev){
+		ev.cancelBubble=true;
+	};	
+}
+
+//警告弹窗（自动消失）
+function warnBox(text){	//弹出的内容
+	var deleteModel= model();	//创建膜态层，返回膜态层的删除函数（闭包）
+	//创建对象
+	var oBox=document.createElement('div');
+	oBox.className="warnBox"
+	oBox.innerHTML=text;	
+	document.body.appendChild(oBox);
+	//调用居中
+	showCenter(oBox);
+	oBox.style.top="10%";
+	//调用拖拽
+	fnObjDrag(oBox);
+	//自动关闭	
+	
+	var timer=setInterval(function(){
+		document.body.removeChild(oBox);
+		deleteModel();
+	},2000)
+	oBox.onmouseenter=function(){
+			clearInterval(timer);
+	};
+	oBox.onmouseleave=function(){
+		timer=setInterval(function(){
+			document.body.removeChild(oBox);
+			deleteModel();
+		},2000)
+	};
+
+}//警告弹窗结束
+
+
+
+
+
+
+
+
