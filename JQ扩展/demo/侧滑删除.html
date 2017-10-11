@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>侧滑删除</title>
+	<style>
+		.wrap{ width: 500px; height: 1000px; margin: 50px; border: 1px solid #ccc; position: relative; }
+		.item{ width: 100%; border: 2px solid red; height: 30px; }
+	</style>
+</head>
+<body>
+
+<div class="wrap">
+	<div class="item">第一个	</div>
+	<div class="item">	第一个</div>
+	<div class="item">第一个	</div>
+</div>	
+
+
+</body>
+
+<script src="../js/jquery-2.1.0.js"></script>
+<script type="text/javascript">
+	var x , y;
+	var mousedown = false;
+	var moveX;
+	$(".item").on('mousedown', function(ev) {
+		console.log(x = ev.pageX, y = ev.pageY)
+		mousedown = true;
+
+	}).on('mousemove', function(ev) {
+		ev.preventDefault();
+		if (mousedown) {
+			var endX = ev.pageX;
+			var endY = ev.pageY;
+			moveX =  ev.pageX - x ;
+			if (moveX> 0) {
+				moveX = 0;
+			}
+			if (moveX< -100) {
+				moveX = -100
+			}
+			console.log(moveX)
+			//var translateX = $(ev.target).css("transform")
+			$(ev.target).css("transform", "translateX("+moveX+"px)" )
+		}
+		
+		
+	}).on('mouseup', function(ev) {
+		ev.preventDefault();
+		moveX = moveX < -50 ? -100 : 0;
+		mousedown = false;
+	});
+
+</script>
+
+</html>
