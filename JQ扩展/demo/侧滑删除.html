@@ -24,197 +24,188 @@
 	bindSlideLeft($(".item"), 100 )
 	function bindSlideLeft( $obj , maxX ){
 
-		$obj.on('mousedown', function(ev) {
-			console.log(0)
-			ev.preventDefault();
-			var _self = $(ev.target);
-			var x = ev.pageX;
-			var disX = 0;
 
-			translateX = _self.css("transform");
-			translateX = +translateX.split(",")[4] || 0;
-			
-			//console.log(translateX)
-			function move( distent ){
-				if (distent !== 0) {
-					$(document).attr( "data-slide", true )
-				}else{
-					$(document).attr( "data-slide", false )
-				}
-				_self.css("transform", "translateX("+distent+"px)" );
-			}
-
-			$(window).on('mousedown.slide', function(event) {
-				ev.preventDefault();
-				console.log(1)
-				event.preventDefault();
-				if ( $(document).attr("data-slide") && $obj.index(event.target) !== $obj.index(_self) ) {
-					move( 0 );
-					$(window).off( ".slide" );
-				}
-
-			}).on('mousemove.slide', function(ev) {
-				console.log(2)
-				ev.preventDefault();
-				endX = ev.pageX;
-				disX =  endX - x ;
-				//console.log(disX)
-				if ( translateX === 0 ) {
-					
-					if (disX> 0) {
-						disX = 0;
-					}
-					if (disX< -maxX) {
-						disX = -maxX
-					}
-					
-					move( disX )
-
-				} else{
-
-					if (disX< 0) {
-						disX = 0;
-					}
-					if (disX> maxX) {
-						disX = maxX
-					}
-					move(translateX+disX);
-				}
-				
-			}).on('mouseup.slide', function(ev) {
-				console.log(3)
-				ev.preventDefault();
-				//console.log(translateX+disX)
-				if (disX <= -maxX/2 ) {
-					disX = -maxX;
-				} else if(  disX < maxX/2){
-					disX = 0;
-				} else if( maxX/2 <= disX  ){
-					disX = maxX;
-				}
-				
-				move( translateX+disX );
-				//移除事件
-				$(window).off("mousemove.slide mouseup.slide");
-				
-			});
-
-		})
 	}
 
 		// 左滑删除
 	function bindSlideLeft( $obj , maxX ){
-		var mobile = false;
+		
 		if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
-		 	mobile = true;
+		 	$obj.on('touchstart', function(ev) {
+		 		console.log(0)
+		 		var _self = $(ev.delegateTarget);
+		 		ev = ev.originalEvent.targetTouches[0];
+
+		 		var x = ev.pageX;
+		 		var disX = 0;
+		 		var endX;
+
+		 		translateX = _self.css("transform");
+		 		translateX = +translateX.split(",")[4] || 0;
+		 		
+		 		//console.log(translateX)
+		 		function move( distent ){
+		 			if (distent !== 0) {
+		 				$(document).attr( "data-slide", true )
+		 			}else{
+		 				$(document).attr( "data-slide", false )
+		 			}
+		 			_self.css("transform", "translateX("+distent+"px)" );
+		 		}
+
+		 		if (!$(document).attr("data-slide")) {
+		 			$(window).off("touchstart.slide");
+		 			$(window).on('touchstart.slide', function(ev) {
+		 				console.log(1);
+		 				var tar = ev.target;
+	 					try{
+	 						ev = ev.originalEvent.targetTouches[0];
+	 					}catch(e){}
+		 				
+		 				if ( $(document).attr("data-slide") && !(_self.is(ev.target) || _self.has(ev.target).length!==0  ) ) {
+		 					move( 0 );
+		 					$(window).off( ".slide" );
+		 				}
+		 			})
+		 		}
+		 		
+		 		$(window).on('touchmove.slide', function(ev) {
+		 			console.log(2)
+		 			ev = ev.originalEvent.targetTouches[0];
+
+		 			endX = ev.pageX;
+		 			disX =  endX - x ;
+		 			//console.log(disX)
+		 			if ( translateX === 0 ) {
+		 				
+		 				if (disX> 0) {
+		 					disX = 0;
+		 				}
+		 				if (disX< -maxX) {
+		 					disX = -maxX;
+		 				}
+		 				
+		 				move( disX );
+
+		 			} else{
+
+		 				if (disX< 0) {
+		 					disX = 0;
+		 				}
+		 				if (disX> maxX) {
+		 					disX = maxX;
+		 				}
+		 				move(translateX+disX);
+		 			}
+		 			
+		 		}).on('touchend.slide', function(ev) {
+		 			console.log(3)
+		 			ev.preventDefault();
+		 			if (mobile) {
+		 				ev = ev.originalEvent.targetTouches[0];
+		 			}
+		 			
+		 			//console.log(translateX+disX)
+		 			if (disX <= -maxX/2 ) {
+		 				disX = -maxX;
+		 			} else if(  disX < maxX/2){
+		 				disX = 0;
+		 			} else if( maxX/2 <= disX  ){
+		 				disX = maxX;
+		 			}
+		 			
+		 			move( translateX+disX );
+		 			//移除事件
+		 			$(window).off("touchmove.slide touchend.slide");
+		 			
+		 		});
+
+		 	});
+		}else{
+			$obj.on('mousedown', function(ev) {
+				console.log(0)
+				ev.preventDefault();
+				var _self = $(ev.target);
+				var x = ev.pageX;
+				var disX = 0;
+
+				translateX = _self.css("transform");
+				translateX = +translateX.split(",")[4] || 0;
+				
+				//console.log(translateX)
+				function move( distent ){
+					if (distent !== 0) {
+						$(document).attr( "data-slide", true )
+					}else{
+						$(document).attr( "data-slide", false )
+					}
+					_self.css("transform", "translateX("+distent+"px)" );
+				}
+
+				if (!$(document).attr("data-slide")) {
+		 			$(window).off("mousedown.slide");
+		 			$(window).on('mousedown.slide', function(ev) {
+		 				console.log(1)
+		 				var tar = ev.target;
+		 				
+		 				if ( $(document).attr("data-slide") && !(_self.is(ev.target) || _self.has(ev.target).length!==0  ) ) {
+		 					move( 0 );
+		 					$(window).off( ".slide" );
+		 				}
+		 			});
+		 		}
+
+				$(window).on('mousemove.slide', function(ev) {
+					console.log(2)
+					ev.preventDefault();
+					endX = ev.pageX;
+					disX =  endX - x ;
+					//console.log(disX)
+					if ( translateX === 0 ) {
+						
+						if (disX> 0) {
+							disX = 0;
+						}
+						if (disX< -maxX) {
+							disX = -maxX
+						}
+						
+						move( disX )
+
+					} else{
+
+						if (disX< 0) {
+							disX = 0;
+						}
+						if (disX> maxX) {
+							disX = maxX
+						}
+						move(translateX+disX);
+					}
+					
+				}).on('mouseup.slide', function(ev) {
+					console.log(3)
+					ev.preventDefault();
+					//console.log(translateX+disX)
+					if (disX <= -maxX/2 ) {
+						disX = -maxX;
+					} else if(  disX < maxX/2){
+						disX = 0;
+					} else if( maxX/2 <= disX  ){
+						disX = maxX;
+					}
+					
+					move( translateX+disX );
+					//移除事件
+					$(window).off("mousemove.slide mouseup.slide");
+					
+				});
+
+			});
 		}
 
-		$obj.on('touchstart', function(ev) {
-
-			console.log(0)
-			
-			var _self = $(ev.delegateTarget);
-			if (mobile) {
-				ev = ev.originalEvent.targetTouches[0];
-			}else{
-				ev.preventDefault();
-			}
-			
-			var x = ev.pageX;
-			var disX = 0;
-			var endX;
-
-			translateX = _self.css("transform");
-			translateX = +translateX.split(",")[4] || 0;
-			
-			//console.log(translateX)
-			function move( distent ){
-				if (distent !== 0) {
-					$(document).attr( "data-slide", true )
-				}else{
-					$(document).attr( "data-slide", false )
-				}
-				_self.css("transform", "translateX("+distent+"px)" );
-			}
-
-			if (!$(document).attr("data-slide")) {
-				$(window).off("touchstart.slide");
-				$(window).on('touchstart.slide', function(ev) {
-					var tar = ev.target;
-					if (mobile) {
-						try{
-							ev = ev.originalEvent.targetTouches[0];
-						}catch(e){}
-					}else{
-						ev.preventDefault();
-					}
-					console.log(1)
-					if ( $(document).attr("data-slide") && !(_self.is(ev.target) || _self.has(ev.target).length!==0  ) ) {
-						move( 0 );
-						$(window).off( ".slide" );
-					}
-				})
-			}
-			
-			
-
-			$(window).on('touchmove.slide', function(ev) {
-				console.log(2)
-				if (mobile) {
-					ev = ev.originalEvent.targetTouches[0];
-				}else{
-					ev.preventDefault();
-				}
-				
-				endX = ev.pageX;
-				disX =  endX - x ;
-				//console.log(disX)
-				if ( translateX === 0 ) {
-					
-					if (disX> 0) {
-						disX = 0;
-					}
-					if (disX< -maxX) {
-						disX = -maxX
-					}
-					
-					move( disX )
-
-				} else{
-
-					if (disX< 0) {
-						disX = 0;
-					}
-					if (disX> maxX) {
-						disX = maxX
-					}
-					move(translateX+disX);
-				}
-				
-			}).on('touchend.slide', function(ev) {
-				console.log(3)
-				ev.preventDefault();
-				if (mobile) {
-					ev = ev.originalEvent.targetTouches[0];
-				}
-				
-				//console.log(translateX+disX)
-				if (disX <= -maxX/2 ) {
-					disX = -maxX;
-				} else if(  disX < maxX/2){
-					disX = 0;
-				} else if( maxX/2 <= disX  ){
-					disX = maxX;
-				}
-				
-				move( translateX+disX );
-				//移除事件
-				$(window).off("touchmove.slide touchend.slide");
-				
-			});
-
-		})
-
+		
+	}
 	
 </script>
 
