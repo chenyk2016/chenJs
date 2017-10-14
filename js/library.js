@@ -194,6 +194,7 @@ function warnBox(text){	//弹出的内容
 // 1 左滑删除（兼容移动）
 function bindSlideLeft( $obj , maxX ){
 	
+	//移动端
 	if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
 	 	$obj.on('touchstart', function(ev) {
 	 		console.log(0)
@@ -285,7 +286,9 @@ function bindSlideLeft( $obj , maxX ){
 	 		});
 
 	 	});
+
 	}else{
+	//pc端
 		$obj.on('mousedown', function(ev) {
 			console.log(0)
 			ev.preventDefault();
@@ -427,6 +430,11 @@ function multiSelect( $switch, $opt ){
 	});
 }
 
+//字体适配
+function autoFont(){
+	document.html.style.fontSize = Math.seil( $(window).width()/3.75);
+	$("html").css("fontSize" ,Math.seil( $(window).width()/3.75) );
+}
 
 
 
