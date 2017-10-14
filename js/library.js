@@ -191,7 +191,241 @@ function warnBox(text){	//弹出的内容
 
 // JQ工具==============================================================
 
+// 1 左滑删除（兼容移动）
+function bindSlideLeft( $obj , maxX ){
+	
+	if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
+	 	$obj.on('touchstart', function(ev) {
+	 		console.log(0)
+	 		var _self = $(ev.delegateTarget);
+	 		ev = ev.originalEvent.targetTouches[0];
 
+	 		var x = ev.pageX;
+	 		var disX = 0;
+	 		var endX;
+
+	 		translateX = _self.css("transform");
+	 		translateX = +translateX.split(",")[4] || 0;
+	 		
+	 		//console.log(translateX)
+	 		function move( distent ){
+	 			if (distent !== 0) {
+	 				$(document).attr( "data-slide", true )
+	 			}else{
+	 				$(document).attr( "data-slide", false )
+	 			}
+	 			_self.css("transform", "translateX("+distent+"px)" );
+	 		}
+
+	 		if (!$(document).attr("data-slide")) {
+	 			$(window).off("touchstart.slide");
+	 			$(window).on('touchstart.slide', function(ev) {
+	 				console.log(1);
+	 				var tar = ev.target;
+ 					try{
+ 						ev = ev.originalEvent.targetTouches[0];
+ 					}catch(e){}
+	 				
+	 				if ( $(document).attr("data-slide") && !(_self.is(ev.target) || _self.has(ev.target).length!==0  ) ) {
+	 					move( 0 );
+	 					$(window).off( ".slide" );
+	 				}
+	 			})
+	 		}
+	 		
+	 		$(window).on('touchmove.slide', function(ev) {
+	 			console.log(2)
+	 			ev = ev.originalEvent.targetTouches[0];
+
+	 			endX = ev.pageX;
+	 			disX =  endX - x ;
+	 			//console.log(disX)
+	 			if ( translateX === 0 ) {
+	 				
+	 				if (disX> 0) {
+	 					disX = 0;
+	 				}
+	 				if (disX< -maxX) {
+	 					disX = -maxX;
+	 				}
+	 				
+	 				move( disX );
+
+	 			} else{
+
+	 				if (disX< 0) {
+	 					disX = 0;
+	 				}
+	 				if (disX> maxX) {
+	 					disX = maxX;
+	 				}
+	 				move(translateX+disX);
+	 			}
+	 			
+	 		}).on('touchend.slide', function(ev) {
+	 			console.log(3)
+	 			ev.preventDefault();
+	 			if (mobile) {
+	 				ev = ev.originalEvent.targetTouches[0];
+	 			}
+	 			
+	 			//console.log(translateX+disX)
+	 			if (disX <= -maxX/2 ) {
+	 				disX = -maxX;
+	 			} else if(  disX < maxX/2){
+	 				disX = 0;
+	 			} else if( maxX/2 <= disX  ){
+	 				disX = maxX;
+	 			}
+	 			
+	 			move( translateX+disX );
+	 			//移除事件
+	 			$(window).off("touchmove.slide touchend.slide");
+	 			
+	 		});
+
+	 	});
+	}else{
+		$obj.on('mousedown', function(ev) {
+			console.log(0)
+			ev.preventDefault();
+			var _self = $(ev.target);
+			var x = ev.pageX;
+			var disX = 0;
+
+			translateX = _self.css("transform");
+			translateX = +translateX.split(",")[4] || 0;
+			
+			//console.log(translateX)
+			function move( distent ){
+				if (distent !== 0) {
+					$(document).attr( "data-slide", true )
+				}else{
+					$(document).attr( "data-slide", false )
+				}
+				_self.css("transform", "translateX("+distent+"px)" );
+			}
+
+			if (!$(document).attr("data-slide")) {
+	 			$(window).off("mousedown.slide");
+	 			$(window).on('mousedown.slide', function(ev) {
+	 				console.log(1)
+	 				var tar = ev.target;
+	 				
+	 				if ( $(document).attr("data-slide") && !(_self.is(ev.target) || _self.has(ev.target).length!==0  ) ) {
+	 					move( 0 );
+	 					$(window).off( ".slide" );
+	 				}
+	 			});
+	 		}
+
+			$(window).on('mousemove.slide', function(ev) {
+				console.log(2)
+				ev.preventDefault();
+				endX = ev.pageX;
+				disX =  endX - x ;
+				//console.log(disX)
+				if ( translateX === 0 ) {
+					
+					if (disX> 0) {
+						disX = 0;
+					}
+					if (disX< -maxX) {
+						disX = -maxX
+					}
+					
+					move( disX )
+
+				} else{
+
+					if (disX< 0) {
+						disX = 0;
+					}
+					if (disX> maxX) {
+						disX = maxX
+					}
+					move(translateX+disX);
+				}
+				
+			}).on('mouseup.slide', function(ev) {
+				console.log(3)
+				ev.preventDefault();
+				//console.log(translateX+disX)
+				if (disX <= -maxX/2 ) {
+					disX = -maxX;
+				} else if(  disX < maxX/2){
+					disX = 0;
+				} else if( maxX/2 <= disX  ){
+					disX = maxX;
+				}
+				
+				move( translateX+disX );
+				//移除事件
+				$(window).off("mousemove.slide mouseup.slide");
+				
+			});
+
+		});
+	}
+}
+
+// 2 兼容android关闭软键盘事件
+$("#search_text").focus(function (d) {
+	var wHeight;
+	wHeight = window.innerHeight;
+	$(window).resize(function (ev) {
+		var hh = window.innerHeight;
+		var viewTop = $(window).scrollTop();
+		//console.log( hh, viewTop );
+		if( Math.abs(wHeight - hh) < 10 ) {
+			$("#search_text").blur();
+			$(window).off("resize");
+		}
+	});
+});
+
+
+/**
+ * 3 多选 
+ * @param  {$obj} $switch 全选按钮
+ * @param  {$obj} $opt    选项
+ * 注意：动态切换selected类名      
+ * @return {none}         
+ */
+function multiSelect( $switch, $opt ){
+	var max = $opt.length;
+	var num = 0;
+
+	$switch.click(function(event) {
+		if ($switch.hasClass('selected')) {
+			$switch.removeClass('selected');
+			$opt.removeClass('selected');
+			num = 0;
+		}else{
+			$switch.addClass('selected');
+			$opt.addClass('selected');
+			num = max;
+		}
+	});
+
+	$opt.click(function(event) {
+		var $tar = $( event.delegateTarget );
+
+		if ( $tar.hasClass('selected') ) {
+			$tar.removeClass('selected')
+			num--;
+		}else{
+			$tar.addClass('selected')
+			num++;
+		}
+		//是否全选
+		if (num === max) {
+			$switch.addClass('selected');
+		}else{
+			$switch.removeClass('selected');
+		}
+	});
+}
 
 
 
